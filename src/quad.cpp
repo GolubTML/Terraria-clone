@@ -1,18 +1,19 @@
 #include "headers/quad.h"
 
-Quad::Quad(glm::vec2 position = glm::vec2(0.f, 0.f),  float scale = 1.f, float rotation = 0.f) : pos(position), size(scale), rot(rotation)
+Quad::Quad(glm::vec2 position = glm::vec2(0.f, 0.f),  float scale = 1.f, float rotation = 0.f, float w = 1.f, float h = 1.f) 
+            : pos(position), size(scale), rot(rotation), width(w), height(h)
 {
     float vertices[] = 
     {
         //X    Y      Z
 
-        -30.f, -30.f, 0.f,
-        30.f , -30.f, 0.f,
-        30.f ,  30.f, 0.f,
+        -width, -height, 0.f,
+        width, -height, 0.f,
+        width,  height, 0.f,
 
-        -30.f, -30.f, 0.f,
-        -30.f , 30.f, 0.f,
-        30.f ,  30.f, 0.f,
+        -width, -height, 0.f,
+        -width , height, 0.f,
+        width ,  height, 0.f,
     };
 
     glGenBuffers(1, &VBO);
@@ -38,4 +39,10 @@ void Quad::draw(Shader& shader)
 
     glBindVertexArray(VAO);
     glDrawArrays(GL_TRIANGLES, 0, 6);
+}
+
+bool Quad::checkCollision(const AABB& a, const AABB& b)
+{
+    return (fabs(a.pos.x - b.pos.x) <= (a.center.x + b.center.x)) &&
+           (fabs(a.pos.y - b.pos.y) <= (a.center.y + b.center.y));
 }
