@@ -7,13 +7,13 @@ Quad::Quad(glm::vec2 position = glm::vec2(0.f, 0.f),  float scale = 1.f, float r
     {
         //X    Y      Z
 
-        -width, -height, 0.f,
-        width, -height, 0.f,
-        width,  height, 0.f,
+        -width / 2.f, -height / 2.f, 0.f,
+        width / 2.f, -height / 2.f, 0.f,
+        width / 2.f,  height / 2.f, 0.f,
 
-        -width, -height, 0.f,
-        -width , height, 0.f,
-        width ,  height, 0.f,
+        -width / 2.f, -height / 2.f, 0.f,
+        -width / 2.f , height / 2.f, 0.f,
+        width / 2.f ,  height / 2.f, 0.f,
     };
 
     glGenBuffers(1, &VBO);
@@ -41,8 +41,18 @@ void Quad::draw(Shader& shader)
     glDrawArrays(GL_TRIANGLES, 0, 6);
 }
 
-bool Quad::checkCollision(const AABB& a, const AABB& b)
+bool Quad::checkCollision(const Quad& another)
 {
-    return (fabs(a.pos.x - b.pos.x) <= (a.center.x + b.center.x)) &&
-           (fabs(a.pos.y - b.pos.y) <= (a.center.y + b.center.y));
+    float leftA   = pos.x - width  / 2.0f;
+    float rightA  = pos.x + width  / 2.0f;
+    float bottomA = pos.y - height / 2.0f;
+    float topA    = pos.y + height / 2.0f;
+
+    float leftB   = another.pos.x - another.width  / 2.0f;
+    float rightB  = another.pos.x + another.width  / 2.0f;
+    float bottomB = another.pos.y - another.height / 2.0f;
+    float topB    = another.pos.y + another.height / 2.0f;
+
+    return leftA < rightB && rightA > leftB &&
+           bottomA < topB && topA > bottomB;
 }

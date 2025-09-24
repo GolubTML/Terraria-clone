@@ -6,11 +6,6 @@
 #include <glm/gtc/type_ptr.hpp> 
 #include "shader.h"
 
-struct AABB
-{
-    glm::vec2 pos;
-    glm::vec2 center;
-};
 
 class Quad
 {
@@ -24,7 +19,7 @@ public:
 
     Quad(glm::vec2 position, float scale, float rotation, float w, float h);
 
-    bool checkCollision(const AABB& a, const AABB& b);
+    bool checkCollision(const Quad& another);
 
     void draw(Shader& shader);
 };

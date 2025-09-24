@@ -11,9 +11,7 @@
 #include "headers/shader.h"
 #include "headers/quad.h"
 #include "headers/player.h"
-#include "ImGui/imgui.h"
-#include "ImGui/backends/imgui_impl_glfw.h"
-#include "ImGui/backends/imgui_impl_opengl3.h"
+
 
 void input(GLFWwindow* window, glm::vec2& pos, float velocity)
 {
@@ -59,15 +57,6 @@ int main (int argv, char* args[])
 
     bool showDebugWindow = false;
 
-    IMGUI_CHECKVERSION();
-    /*ImGui::CreateContext();
-    ImGuiIO& io = ImGui::GetIO();
-
-    ImGui::StyleColorsDark();
-
-    ImGui_ImplGlfw_InitForOpenGL(window, true);
-    ImGui_ImplOpenGL3_Init("#version 330");*/
-
     while (!glfwWindowShouldClose(window))
     {
         float currentFrame = glfwGetTime();
@@ -76,33 +65,6 @@ int main (int argv, char* args[])
 
         glClearColor(0.1f, 0.1f, 0.1f, 1.f);
         glClear(GL_COLOR_BUFFER_BIT);
-
-        /*if (glfwGetKey(window, GLFW_KEY_F4) == GLFW_PRESS) 
-        {
-            static bool wasPressed = false;
-            if (!wasPressed) 
-            {
-                showDebugWindow = !showDebugWindow; 
-                wasPressed = true;
-            }
-            else 
-            {
-                wasPressed = false;
-            }
-        }
-
-        ImGui::NewFrame();
-
-        if (showDebugWindow) 
-        {
-            ImGui::Begin("Debug");
-            ImGui::Text("Player pos: (%.1f, %.1f)", player.skin.pos.x, player.skin.pos.y);
-            ImGui::Text("Vel: (%.2f, %.2f)", player.vel.x, player.vel.y);
-            //ImGui::Checkbox("Show colliders", &showColliders);
-            ImGui::End();
-        }
-
-        ImGui::Render();*/
 
         glm::mat4 projection = glm::ortho(0.0f, 800.0f, 0.0f, 600.0f, -1.0f, 1.0f);
         GLuint projLoc = glGetUniformLocation(shader.ID, "projection");
