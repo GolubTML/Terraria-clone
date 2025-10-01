@@ -7,6 +7,7 @@
 #include <fstream>
 #include <sstream>
 #include <string>
+#include <vector>
 
 #include "headers/shader.h"
 #include "headers/quad.h"
@@ -19,6 +20,24 @@ void input(GLFWwindow* window, glm::vec2& pos, float velocity)
     if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) pos.y -= velocity;
     if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) pos.x -= velocity;
     if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) pos.x += velocity;
+}
+
+std::vector<std::vector<Quad>> quadLand(int size)
+{
+    std::vector<std::vector<Quad>> col;
+    for (int i = 0; i < size; ++i)
+    {
+        std::vector<Quad> row;
+        for (int j = 0; j < size; ++j)
+        {
+            Quad quad(glm::vec2(i * 16.f, j * 16.f), 1.f, 0.f, 16.f, 16.f);
+            row.push_back(quad);
+        }
+
+        col.push_back(row);
+    }
+
+    return col;
 }
 
 int main (int argv, char* args[])
@@ -47,7 +66,7 @@ int main (int argv, char* args[])
     Shader shader("src/shaders/vertex.glsl", "src/shaders/fragment.glsl");
     shader.use();
 
-    Quad playerSkin(glm::vec2(400.f, 300.f), 1.f, 0.f, 30.f, 30.f);
+    Quad playerSkin(glm::vec2(0.f, 300.f), 1.f, 0.f, 30.f, 30.f);
     Player player(playerSkin);
 
     Quad platform(glm::vec2(400.f, 100.f), 1.f, 0.f, 400.f, 30.f);
@@ -56,6 +75,8 @@ int main (int argv, char* args[])
     float deltaTime = 0.0f;
 
     bool showDebugWindow = false;
+
+    std::vector<std::vector<Quad>> world = quadLand(10);
 
     while (!glfwWindowShouldClose(window))
     {
@@ -72,10 +93,18 @@ int main (int argv, char* args[])
 
         shader.use();
 
-        player.update(window, 50.5f, platform, deltaTime);
+        player.update(window, 100.5f, world, deltaTime);
 
         player.draw(shader);
         platform.draw(shader);
+
+        for (auto row : world)
+        {
+            for (Quad block : row)
+            {
+                block.draw(shader);
+            }
+        }
 
         glfwSwapBuffers(window);
         glfwPollEvents();
