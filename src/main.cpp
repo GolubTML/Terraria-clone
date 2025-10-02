@@ -12,6 +12,7 @@
 #include "headers/shader.h"
 #include "headers/quad.h"
 #include "headers/player.h"
+#include "headers/texture.h"
 
 
 void input(GLFWwindow* window, glm::vec2& pos, float velocity)
@@ -30,7 +31,7 @@ std::vector<std::vector<Quad>> quadLand(int size)
         std::vector<Quad> row;
         for (int j = 0; j < size; ++j)
         {
-            Quad quad(glm::vec2(i * 16.f, j * 16.f), 1.f, 0.f, 16.f, 16.f);
+            Quad quad(glm::vec2(i * 16.f, j * 16.f), 1.f, 0.f, 16.f, 16.f, nullptr);
             row.push_back(quad);
         }
 
@@ -66,10 +67,11 @@ int main (int argv, char* args[])
     Shader shader("src/shaders/vertex.glsl", "src/shaders/fragment.glsl");
     shader.use();
 
-    Quad playerSkin(glm::vec2(0.f, 300.f), 1.f, 0.f, 30.f, 30.f);
+    Quad playerSkin(glm::vec2(0.f, 300.f), 1.f, 0.f, 30.f, 30.f, nullptr);
     Player player(playerSkin);
 
-    Quad platform(glm::vec2(400.f, 100.f), 1.f, 0.f, 400.f, 30.f);
+    Texture texture("textures/tiles/stone.png", 16, 16);
+    Quad platform(glm::vec2(400.f, 100.f), 1.f, 0.f, 400.f, 30.f, &texture);
 
     float lastFrame = 0.0f;
     float deltaTime = 0.0f;
