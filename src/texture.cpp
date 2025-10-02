@@ -31,22 +31,21 @@ void Texture::unbind()
     glBindTexture(GL_TEXTURE_2D, 0);
 }
 
-void Texture::getUV(int tileX, int tileY, float uv[8])
+void Texture::getUV(float tileX, float tileY, float uv[8])
 {
-    float u = (tileX * tileWidth) / (float)width;
-    float v = (tileY * tileHeight) / (float)height;
-    float u2 = ((tileX+1) * tileWidth) / (float)width;
-    float v2 = ((tileY+1) * tileHeight) / (float)height;
+    int stepX = tileWidth; 
+    int stepY = tileHeight; 
+    int realW = tileWidth - 1; 
+    int realH = tileHeight - 1; 
 
-    uv[0] = u;
-    uv[1] = v;
+    float u  = (tileX * stepX) / (float)width;
+    float v  = (tileY * stepY) / (float)height;
+    float u2 = (tileX * stepX + realW) / (float)width;
+    float v2 = (tileY * stepY + realH) / (float)height;
+    
 
-    uv[2] = u2;
-    uv[3] = v;
-
-    uv[4] = u;
-    uv[5] = v2;
-
-    uv[6] = u2;
-    uv[7] = v2;
+    uv[0] = u;  uv[1] = v;
+    uv[2] = u2; uv[3] = v;
+    uv[4] = u;  uv[5] = v2;
+    uv[6] = u2; uv[7] = v2;
 }

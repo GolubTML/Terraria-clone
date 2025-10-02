@@ -17,5 +17,5 @@ public:
     void bind();
     void unbind();
 
-    void getUV(int tileX, int tileY, float uv[8]);
+    void getUV(float tileX, float tileY, float uv[8]);
 };

@@ -13,6 +13,7 @@
 #include "headers/quad.h"
 #include "headers/player.h"
 #include "headers/texture.h"
+#include "headers/world.h"
 
 
 void input(GLFWwindow* window, glm::vec2& pos, float velocity)
@@ -31,7 +32,7 @@ std::vector<std::vector<Quad>> quadLand(int size)
         std::vector<Quad> row;
         for (int j = 0; j < size; ++j)
         {
-            Quad quad(glm::vec2(i * 16.f, j * 16.f), 1.f, 0.f, 16.f, 16.f, nullptr);
+            Quad quad(glm::vec2(i * 16.f, j * 16.f), 1.f, 0.f, 16.f, 16.f, nullptr, 0, 0);
             row.push_back(quad);
         }
 
@@ -64,14 +65,19 @@ int main (int argv, char* args[])
 
     glViewport(0, 0, 800, 600);
 
+    //stbi_set_flip_vertically_on_load(true); 
+
+    int tileX = 0;
+    int tileY = 0;
+
     Shader shader("src/shaders/vertex.glsl", "src/shaders/fragment.glsl");
     shader.use();
+    Texture texture("textures/tiles/stone.png", 16, 16);
 
-    Quad playerSkin(glm::vec2(0.f, 300.f), 1.f, 0.f, 30.f, 30.f, nullptr);
+    Quad playerSkin(glm::vec2(0.f, 300.f), 1.f, 0.f, 30.f, 30.f, nullptr, 0.f, 0.f);
     Player player(playerSkin);
 
-    Texture texture("textures/tiles/stone.png", 16, 16);
-    Quad platform(glm::vec2(400.f, 100.f), 1.f, 0.f, 400.f, 30.f, &texture);
+    Quad platform(glm::vec2(400.f, 100.f), 1.f, 0.f, 400.f, 30.f, nullptr, 0, 0);
 
     float lastFrame = 0.0f;
     float deltaTime = 0.0f;
@@ -79,6 +85,8 @@ int main (int argv, char* args[])
     bool showDebugWindow = false;
 
     std::vector<std::vector<Quad>> world = quadLand(10);
+    World world1(100, 50, static_cast<int>(time(nullptr)), 0.05f);
+    world1.generate(texture);
 
     while (!glfwWindowShouldClose(window))
     {
@@ -95,12 +103,12 @@ int main (int argv, char* args[])
 
         shader.use();
 
-        player.update(window, 100.5f, world, deltaTime);
+        player.update(window, 100.5f, world1.tiles, deltaTime);
 
         player.draw(shader);
         platform.draw(shader);
 
-        for (auto row : world)
+        for (auto row : world1.tiles)
         {
             for (Quad block : row)
             {

@@ -1,19 +1,31 @@
 #include "headers/quad.h"
 
-Quad::Quad(glm::vec2 position = glm::vec2(0.f, 0.f), float scale = 1.f, float rotation = 0.f, float w = 1.f, float h = 1.f, Texture* tex = nullptr) 
+Quad::Quad(glm::vec2 position, float scale, float rotation, float w, float h, Texture* tex, float tileX, float tileY) 
             : pos(position), size(scale), rot(rotation), width(w), height(h), texture(tex)
 {
+    float uv[8];
+
+    if (texture != nullptr)
+    {
+        texture->getUV(tileX, tileY, uv);
+    }
+    else 
+    {
+        uv[0] = uv[2] = uv[4] = uv[6] = 0.0f;
+        uv[1] = uv[3] = uv[5] = uv[7] = 0.0f;
+    }
+
     float vertices[] = 
     {
         //X            Y            Z      U    V
 
-        -width / 2.f, -height / 2.f, 0.f,  0.f, 0.f,
-        width / 2.f, -height / 2.f , 0.f,  1.f, 0.f,
-        width / 2.f,  height / 2.f , 0.f,  1.f, 1.f,
+        -width / 2.f, -height / 2.f, 0.f,  uv[0], uv[1],
+        width / 2.f, -height / 2.f , 0.f,  uv[2], uv[3],
+        width / 2.f,  height / 2.f , 0.f,  uv[6], uv[7],
 
-        -width / 2.f, -height / 2.f, 0.f,  1.f, 1.f,
-        -width / 2.f , height / 2.f, 0.f,  0.f, 1.f,
-        width / 2.f ,  height / 2.f, 0.f,  0.f, 0.f
+        -width / 2.f, -height / 2.f, 0.f,  uv[0], uv[1],
+        -width / 2.f , height / 2.f, 0.f,  uv[4], uv[5],
+        width / 2.f ,  height / 2.f, 0.f,  uv[6], uv[7],
     };
 
     glGenBuffers(1, &VBO);
@@ -48,7 +60,10 @@ void Quad::draw(Shader& shader)
         texture->bind();
 
         glUniform1i(glGetUniformLocation(shader.ID, "uTexture"), 0);
+        glUniform1i(glGetUniformLocation(shader.ID, "uUseTexture"), true);
     }
+    else 
+        glUniform1i(glGetUniformLocation(shader.ID, "uUseTexture"), false);
 
     glBindVertexArray(VAO);
     glDrawArrays(GL_TRIANGLES, 0, 6);
