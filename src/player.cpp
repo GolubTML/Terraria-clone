@@ -28,6 +28,12 @@ void Player::update(GLFWwindow* window, float speed, std::vector<std::vector<Qua
         
         vel.y = vel.y;
     }
+
+    if (std::isnan(skin.pos.x) || std::isnan(skin.pos.y))
+        std::cout << "NaN detected!" << std::endl;
+
+
+    std::cout << "X: " << skin.pos.x << ", " << "Y: " << skin.pos.y << std::endl;
 }
 
 void Player::collideX(std::vector<std::vector<Quad>> world)

@@ -4,7 +4,7 @@ World::World(int w, int h, int s , float sc) : width(w), height(h), seed(s), sca
 {
 }
 
-void World::generate(Texture stoneTex)
+void World::generate(Texture& stoneTex, Texture& grass)
 {
     tiles.clear();
 
@@ -13,17 +13,45 @@ void World::generate(Texture stoneTex)
         std::vector<Quad> row;
         for (int x = 0; x < width; ++x)
         {
-            float n = stb_perlin_noise3((x + seed) * scale, (y + seed) * scale, 0.f, 0, 0, 0);
-
+            float n = getNoise(x, seed, scale);
             n = (n + 1.f) / 2.f;
 
+            int groundHeight = (int)(n * height * 0.5f + height * 0.25f);
 
-            if (n < 0.5f)
+            if (y > groundHeight) continue;
+
+            if (y < groundHeight)
                 row.emplace_back(glm::vec2(x * 16.f, y * 16.f), 1.f, 0.f, 16.f, 16.f, &stoneTex, 3.4f, 1.1f);
-            else 
-                continue;
+            else if (y == groundHeight)
+                row.emplace_back(glm::vec2(x * 16.f, y * 16.f), 1.f, 0.f, 16.f, 16.f, &grass, 1.1f, 2.3f);
 
         }
         tiles.push_back(row);
     }
+}
+
+float World::getNoise(float x, float seed, float scale)
+{
+    // Базовый шум верхенего словя мира. Построен на основе fractional Brownian motion(фрактального шума).
+    // Содержит такие переменные как total, amp, freq и maxValue.
+    // total - отвечает за количество волн в шуме.
+    // amp - амлитуда, то есть сила шума.
+    // freq - множитель частоты.
+    // maxValue - максимальное значение, для того чтобы сделать нормализацию до -1, 1.
+    float total = 0; 
+    float amp = 1.f;
+    float freq = 1.f;
+    float maxValue = 0;
+
+    for (int i = 0; i < 4; ++i)
+    {
+        // По факту, чем меньше freq, тем менее четче будет шум.
+        total += stb_perlin_noise3(x * scale * freq, seed * 0.1f, 0.f, 0, 0, 0) * amp; 
+        maxValue += amp; // - Нужно для нормализовки в будущем.
+        amp *= 0.5f; // - Для того, чтобы следующие октавы были меньше. Эффект холмов.
+        freq *= 2.f; // - Для того, чтобы следующие октавы былы менее детолезированы.
+    }
+    
+    // Нормализуем и возращаем наш шум.
+    return total / maxValue;
 }

@@ -8,12 +8,21 @@
 #include <sstream>
 #include <string>
 #include <vector>
+#include <chrono>
 
 #include "headers/shader.h"
 #include "headers/quad.h"
 #include "headers/player.h"
 #include "headers/texture.h"
 #include "headers/world.h"
+#include "headers/camera.h"
+
+unsigned int getRandomSeed() {
+    using namespace std::chrono;
+    return static_cast<unsigned int>(
+        duration_cast<milliseconds>(steady_clock::now().time_since_epoch()).count()
+    );
+}
 
 
 void input(GLFWwindow* window, glm::vec2& pos, float velocity)
@@ -70,14 +79,16 @@ int main (int argv, char* args[])
     int tileX = 0;
     int tileY = 0;
 
+    Camera camera(800, 600);
+
     Shader shader("src/shaders/vertex.glsl", "src/shaders/fragment.glsl");
     shader.use();
-    Texture texture("textures/tiles/stone.png", 16, 16);
+    Texture stone("textures/tiles/Tiles_1.png", 16, 16);
+    Texture dirt("textures/tiles/Tiles_0.png", 16, 16);
+    Texture grass("textures/tiles/Tiles_2.png", 16, 16);
 
-    Quad playerSkin(glm::vec2(0.f, 300.f), 1.f, 0.f, 30.f, 30.f, nullptr, 0.f, 0.f);
+    Quad playerSkin(glm::vec2(0.f, 800.f), 1.f, 0.f, 20.f, 48.f, nullptr, 0.f, 0.f);
     Player player(playerSkin);
-
-    Quad platform(glm::vec2(400.f, 100.f), 1.f, 0.f, 400.f, 30.f, nullptr, 0, 0);
 
     float lastFrame = 0.0f;
     float deltaTime = 0.0f;
@@ -85,8 +96,8 @@ int main (int argv, char* args[])
     bool showDebugWindow = false;
 
     std::vector<std::vector<Quad>> world = quadLand(10);
-    World world1(100, 50, static_cast<int>(time(nullptr)), 0.05f);
-    world1.generate(texture);
+    World world1(100, 20, getRandomSeed(), 0.1f);
+    world1.generate(dirt, grass);
 
     while (!glfwWindowShouldClose(window))
     {
@@ -97,7 +108,7 @@ int main (int argv, char* args[])
         glClearColor(0.1f, 0.1f, 0.1f, 1.f);
         glClear(GL_COLOR_BUFFER_BIT);
 
-        glm::mat4 projection = glm::ortho(0.0f, 800.0f, 0.0f, 600.0f, -1.0f, 1.0f);
+        glm::mat4 projection = camera.getProjectionMatrix();
         GLuint projLoc = glGetUniformLocation(shader.ID, "projection");
         glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(projection));
 
@@ -106,7 +117,6 @@ int main (int argv, char* args[])
         player.update(window, 100.5f, world1.tiles, deltaTime);
 
         player.draw(shader);
-        platform.draw(shader);
 
         for (auto row : world1.tiles)
         {

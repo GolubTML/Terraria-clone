@@ -21,5 +21,8 @@ public:
     std::vector<std::vector<Quad>> tiles;
 
     World(int w, int h, int s = static_cast<int>(time(nullptr)), float sc = 0.1f);
-    void generate(Texture stoneTex);
+    void generate(Texture& stoneTex, Texture& grass);
+
+private:
+    float getNoise(float x, float seed, float scale);
 };
