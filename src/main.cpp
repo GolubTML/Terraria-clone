@@ -10,12 +10,17 @@
 #include <vector>
 #include <chrono>
 
+#include "imgui/imgui.h"
+#include "imgui/imgui_impl_glfw.h"
+#include "imgui/imgui_impl_opengl3.h"
+
 #include "headers/shader.h"
 #include "headers/quad.h"
 #include "headers/player.h"
 #include "headers/texture.h"
 #include "headers/world.h"
 #include "headers/camera.h"
+#include "headers/debug.h"
 
 unsigned int getRandomSeed() {
     using namespace std::chrono;
@@ -68,6 +73,7 @@ int main (int argv, char* args[])
         glfwTerminate();
     }
     glfwMakeContextCurrent(window);
+    glfwSwapInterval(0);
 
     if (glewInit() != GLEW_OK)
         throw std::runtime_error("Cannot init glew");
@@ -75,6 +81,8 @@ int main (int argv, char* args[])
     glViewport(0, 0, 800, 600);
 
     //stbi_set_flip_vertically_on_load(true); 
+
+    bool isPressedDebugMode = false;
 
     int tileX = 0;
     int tileY = 0;
@@ -96,8 +104,19 @@ int main (int argv, char* args[])
     bool showDebugWindow = false;
 
     std::vector<std::vector<Quad>> world = quadLand(10);
-    World world1(100, 20, getRandomSeed(), 0.1f);
+    World world1(2000, 50, getRandomSeed(), 0.1f);
     world1.generate(dirt, grass);
+
+    IMGUI_CHECKVERSION();
+    ImGui::CreateContext();
+    ImGuiIO& io = ImGui::GetIO(); (void)io;
+
+    ImGui::StyleColorsDark(); 
+
+    ImGui_ImplGlfw_InitForOpenGL(window, true);
+    ImGui_ImplOpenGL3_Init("#version 130");
+
+    static DebugWindow debug;
 
     while (!glfwWindowShouldClose(window))
     {
@@ -107,6 +126,33 @@ int main (int argv, char* args[])
 
         glClearColor(0.1f, 0.1f, 0.1f, 1.f);
         glClear(GL_COLOR_BUFFER_BIT);
+
+        ImGui_ImplOpenGL3_NewFrame();
+        ImGui_ImplGlfw_NewFrame();
+        ImGui::NewFrame();
+
+        static float f = 0.0f;
+        static int counter = 0;
+
+        if (glfwGetKey(window, GLFW_KEY_F4) == GLFW_PRESS) isPressedDebugMode = true;
+        else isPressedDebugMode = false;
+
+        if (isPressedDebugMode)
+            debug.draw(player, deltaTime);
+
+        ImGui::Render();
+        int display_w, display_h;
+        glfwGetFramebufferSize(window, &display_w, &display_h);
+        glViewport(0, 0, display_w, display_h);
+        glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+        glClear(GL_COLOR_BUFFER_BIT);
+        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
+        camera.move(player.skin.pos - glm::vec2(400.f, 300.f));
+
+        glm::mat4 view = camera.getViewMatrix();
+        GLuint viewLoc = glGetUniformLocation(shader.ID, "view");
+        glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
 
         glm::mat4 projection = camera.getProjectionMatrix();
         GLuint projLoc = glGetUniformLocation(shader.ID, "projection");
@@ -129,6 +175,11 @@ int main (int argv, char* args[])
         glfwSwapBuffers(window);
         glfwPollEvents();
     }
+
+    ImGui_ImplOpenGL3_Shutdown();
+    ImGui_ImplGlfw_Shutdown();
+    ImGui::DestroyContext();
+
 
     glfwDestroyWindow(window);
     glfwTerminate();

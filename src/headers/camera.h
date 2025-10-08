@@ -4,6 +4,9 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp> 
+#include <vector>
+
+#include "quad.h"
 
 class Camera
 {
@@ -16,5 +19,6 @@ public:
     glm::mat4 getViewMatrix() const;
     glm::mat4 getProjectionMatrix() const;
 
-    void move(glm::vec2& target);
+    void move(glm::vec2 target);
+    void draw(const std::vector<std::vector<Quad>> world);
 };

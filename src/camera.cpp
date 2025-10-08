@@ -12,7 +12,7 @@ glm::mat4 Camera::getProjectionMatrix() const
     return glm::ortho(0.f, size.x, 0.f, size.y, -1.f, 1.f);
 }
 
-void Camera::move(glm::vec2& target)
+void Camera::move(glm::vec2 target)
 {
     position = target;
 }

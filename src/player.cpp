@@ -4,15 +4,15 @@ Player::Player(Quad s) : skin(s) { }
 
 void Player::update(GLFWwindow* window, float speed, std::vector<std::vector<Quad>> world, float dT)
 {
+    int rX = 10;
+    int rY = 5;
+
+    int playerTileX = (int)(skin.pos.x / 16.f);
+    int playerTileY = (int)(skin.pos.y / 16.f);
+
     vel.x = 0;
     if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) vel.x -= speed * dT;
     if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) vel.x += speed * dT;
-
-    skin.pos.x += vel.x;
-    collideX(world);
-
-    skin.pos.y += vel.y;
-    collideY(world);
 
     if (!onGround)
     {
@@ -29,11 +29,19 @@ void Player::update(GLFWwindow* window, float speed, std::vector<std::vector<Qua
         vel.y = vel.y;
     }
 
-    if (std::isnan(skin.pos.x) || std::isnan(skin.pos.y))
-        std::cout << "NaN detected!" << std::endl;
+    skin.pos.x += vel.x;
+    skin.pos.y += vel.y;
 
-
-    std::cout << "X: " << skin.pos.x << ", " << "Y: " << skin.pos.y << std::endl;
+    int maxY = (int)world.size();
+    for (int y = std::max(0, playerTileY - rY); y < std::min(maxY, playerTileY + rY + 1); ++y)
+    {
+        int maxX = (int)world[y].size();
+        for (int x = std::max(0, playerTileX - rX); x < std::min(maxX, playerTileX + rX + 1); ++x)
+        {
+            collideX(world);
+            collideY(world);
+        }
+    }
 }
 
 void Player::collideX(std::vector<std::vector<Quad>> world)
