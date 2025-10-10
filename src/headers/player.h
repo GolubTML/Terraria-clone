@@ -9,7 +9,7 @@ class Player
         Quad skin;
         glm::vec2 vel = glm::vec2(0.f, 0.f);
         float gravity = 9.81f;
-        float jumpVelocity = 2.25f;
+        float jumpVelocity = 3.5f;
         bool onGround = false;
 
         Player(Quad s);

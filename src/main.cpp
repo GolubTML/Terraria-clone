@@ -82,7 +82,7 @@ int main (int argv, char* args[])
 
     //stbi_set_flip_vertically_on_load(true); 
 
-    bool isPressedDebugMode = false;
+    static bool debugVisible = false, last = false;
 
     int tileX = 0;
     int tileY = 0;
@@ -95,7 +95,7 @@ int main (int argv, char* args[])
     Texture dirt("textures/tiles/Tiles_0.png", 16, 16);
     Texture grass("textures/tiles/Tiles_2.png", 16, 16);
 
-    Quad playerSkin(glm::vec2(0.f, 800.f), 1.f, 0.f, 20.f, 48.f, nullptr, 0.f, 0.f);
+    Quad playerSkin(glm::vec2(1000.f, 800.f), 1.f, 0.f, 20.f, 48.f, nullptr, 0.f, 0.f);
     Player player(playerSkin);
 
     float lastFrame = 0.0f;
@@ -130,15 +130,14 @@ int main (int argv, char* args[])
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
+        
+        bool now = glfwGetKey(window, GLFW_KEY_F4) == GLFW_PRESS;
+        if (now && !last) debugVisible = !debugVisible;
+        last = now;
 
-        static float f = 0.0f;
-        static int counter = 0;
 
-        if (glfwGetKey(window, GLFW_KEY_F4) == GLFW_PRESS) isPressedDebugMode = true;
-        else isPressedDebugMode = false;
-
-        if (isPressedDebugMode)
-            debug.draw(player, deltaTime);
+        if (debugVisible)
+            debug.draw(player, camera, deltaTime);
 
         ImGui::Render();
         int display_w, display_h;
@@ -148,7 +147,7 @@ int main (int argv, char* args[])
         glClear(GL_COLOR_BUFFER_BIT);
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
-        camera.move(player.skin.pos - glm::vec2(400.f, 300.f));
+        camera.move(player.skin.pos - glm::vec2(400, 300));
 
         glm::mat4 view = camera.getViewMatrix();
         GLuint viewLoc = glGetUniformLocation(shader.ID, "view");
@@ -164,13 +163,7 @@ int main (int argv, char* args[])
 
         player.draw(shader);
 
-        for (auto row : world1.tiles)
-        {
-            for (Quad block : row)
-            {
-                block.draw(shader);
-            }
-        }
+        camera.draw(world1.tiles, shader);
 
         glfwSwapBuffers(window);
         glfwPollEvents();

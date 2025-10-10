@@ -6,8 +6,10 @@
 
 #include "player.h"
 
+class Camera;
+
 class DebugWindow
 {
 public:
-    void draw(Player& player, float dT);
+    void draw(Player& player, Camera& camera, float dT);
 };

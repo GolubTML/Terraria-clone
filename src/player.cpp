@@ -30,18 +30,9 @@ void Player::update(GLFWwindow* window, float speed, std::vector<std::vector<Qua
     }
 
     skin.pos.x += vel.x;
+    collideX(world);
     skin.pos.y += vel.y;
-
-    int maxY = (int)world.size();
-    for (int y = std::max(0, playerTileY - rY); y < std::min(maxY, playerTileY + rY + 1); ++y)
-    {
-        int maxX = (int)world[y].size();
-        for (int x = std::max(0, playerTileX - rX); x < std::min(maxX, playerTileX + rX + 1); ++x)
-        {
-            collideX(world);
-            collideY(world);
-        }
-    }
+    collideY(world);
 }
 
 void Player::collideX(std::vector<std::vector<Quad>> world)

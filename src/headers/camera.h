@@ -20,5 +20,5 @@ public:
     glm::mat4 getProjectionMatrix() const;
 
     void move(glm::vec2 target);
-    void draw(const std::vector<std::vector<Quad>> world);
+    void draw(std::vector<std::vector<Quad>>& world, Shader& shader);
 };

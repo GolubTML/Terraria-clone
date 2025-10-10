@@ -1,6 +1,7 @@
 #include "headers/debug.h"
+#include "headers/camera.h"
 
-void DebugWindow::draw(Player& player, float dT)
+void DebugWindow::draw(Player& player, Camera& camera, float dT)
 {
     ImGui::Begin("Debug mode.");
 
@@ -14,6 +15,10 @@ void DebugWindow::draw(Player& player, float dT)
 
     float fps = 1.f / dT;
     ImGui::Text("FPS: %.1f", fps);
+    ImGui::Separator();
+
+    ImGui::Text("--=Camera=--");
+    ImGui::Text("Position: (%.2f, %.2f)", camera.position.x, camera.position.y);
     ImGui::Separator();
 
     ImGui::End();
