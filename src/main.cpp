@@ -95,7 +95,7 @@ int main (int argv, char* args[])
     Texture dirt("textures/tiles/Tiles_0.png", 16, 16);
     Texture grass("textures/tiles/Tiles_2.png", 16, 16);
 
-    Quad playerSkin(glm::vec2(1000.f, 800.f), 1.f, 0.f, 20.f, 48.f, nullptr, 0.f, 0.f);
+    Quad playerSkin(glm::vec2(1000.f, 800.f), 1.f, 0.f, 20.f, 48.f, &stone, 1.f, 1.f);
     Player player(playerSkin);
 
     float lastFrame = 0.0f;
@@ -147,7 +147,9 @@ int main (int argv, char* args[])
         glClear(GL_COLOR_BUFFER_BIT);
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
-        camera.move(player.skin.pos - glm::vec2(400, 300));
+        camera.move(player.skin.pos);
+        
+        shader.use();
 
         glm::mat4 view = camera.getViewMatrix();
         GLuint viewLoc = glGetUniformLocation(shader.ID, "view");
@@ -157,7 +159,6 @@ int main (int argv, char* args[])
         GLuint projLoc = glGetUniformLocation(shader.ID, "projection");
         glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(projection));
 
-        shader.use();
 
         player.update(window, 100.5f, world1.tiles, deltaTime);
 

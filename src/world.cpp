@@ -18,7 +18,11 @@ void World::generate(Texture& stoneTex, Texture& grass)
 
             int groundHeight = (int)(n * height * 0.5f + height * 0.25f);
 
-            if (y > groundHeight) continue;
+            if (y > groundHeight) 
+            {
+                row.emplace_back(true, true);
+                continue;
+            }
 
             if (y < groundHeight)
                 row.emplace_back(glm::vec2(x * 16.f, y * 16.f), 1.f, 0.f, 16.f, 16.f, &stoneTex, 3.4f, 1.1f);

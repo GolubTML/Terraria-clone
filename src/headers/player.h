@@ -11,11 +11,12 @@ class Player
         float gravity = 9.81f;
         float jumpVelocity = 3.5f;
         bool onGround = false;
+        bool ghostMode = false;
 
         Player(Quad s);
 
-        void update(GLFWwindow* window, float velocity, std::vector<std::vector<Quad>> world, float dT);
-        void collideX(std::vector<std::vector<Quad>> world);
-        void collideY(std::vector<std::vector<Quad>> world);
+        void update(GLFWwindow* window, float velocity, std::vector<std::vector<Quad>>& world, float& dT);
+        void collideX(std::vector<std::vector<Quad>>& world);
+        void collideY(std::vector<std::vector<Quad>>& world);
         void draw(Shader shader);
 };

@@ -2,40 +2,53 @@
 
 Player::Player(Quad s) : skin(s) { }
 
-void Player::update(GLFWwindow* window, float speed, std::vector<std::vector<Quad>> world, float dT)
+void Player::update(GLFWwindow* window, float speed, std::vector<std::vector<Quad>>& world, float& dT)
 {
-    int rX = 10;
-    int rY = 5;
-
-    int playerTileX = (int)(skin.pos.x / 16.f);
-    int playerTileY = (int)(skin.pos.y / 16.f);
-
-    vel.x = 0;
-    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) vel.x -= speed * dT;
-    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) vel.x += speed * dT;
-
-    if (!onGround)
+    if (!ghostMode)
     {
-        vel.y -= gravity * dT;
-    }
-    else 
-    {
-        if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
+        int rX = 10;
+        int rY = 5;
+
+        int playerTileX = (int)(skin.pos.x / 16.f);
+        int playerTileY = (int)(skin.pos.y / 16.f);
+
+        vel.x = 0;
+        if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) vel.x -= speed * dT;
+        if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) vel.x += speed * dT;
+
+        if (!onGround)
         {
-            vel.y = jumpVelocity;
-            onGround = false;     
+            vel.y -= gravity * dT;
         }
-        
-        vel.y = vel.y;
-    }
+        else 
+        {
+            if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
+            {
+                vel.y = jumpVelocity;
+                onGround = false;     
+            }
 
-    skin.pos.x += vel.x;
-    collideX(world);
-    skin.pos.y += vel.y;
-    collideY(world);
+            vel.y = vel.y;
+        }
+
+        skin.pos.x += vel.x;
+        collideX(world);
+        skin.pos.y += vel.y;
+        collideY(world);
+    }
+    else
+    {
+        if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) vel.x -= speed / 10.f;
+        if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) vel.x += speed / 10.f;
+        if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) vel.y += speed / 10.f;
+        if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) vel.y -= speed / 10.f;
+
+        skin.pos.x = vel.x;
+        skin.pos.y = vel.y;
+    }
 }
 
-void Player::collideX(std::vector<std::vector<Quad>> world)
+void Player::collideX(std::vector<std::vector<Quad>>& world)
 {
     for (auto& row : world)
     {
@@ -62,7 +75,7 @@ void Player::collideX(std::vector<std::vector<Quad>> world)
     }
 }
 
-void Player::collideY(std::vector<std::vector<Quad>> world)
+void Player::collideY(std::vector<std::vector<Quad>>& world)
 {
     onGround = false;
 

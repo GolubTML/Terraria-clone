@@ -17,6 +17,10 @@ public:
     float width, height;
     float tileX, tileY;
 
+    bool solid = false;
+    bool visible = false;
+
+    Quad(bool isSolid, bool isVisible);
     Quad(glm::vec2 position = glm::vec2(0.f, 0.f), float scale = 1.f, float rotation = 0.f, float w = 1.f, float h = 1.f, Texture* tex = nullptr, float tileX = 0.f, float tileY = 0.f);
 
     bool checkCollision(const Quad& another);

@@ -1,7 +1,20 @@
 #include "headers/quad.h"
 
+Quad::Quad(bool isSolid, bool isVisible) : solid(isSolid), visible(isVisible)
+{
+    if (isSolid && isVisible)
+    {
+        texture = nullptr;
+        pos = glm::vec2(0.f, 0.f);
+        size = 0.f;
+        rot = 0.f;
+        width = 0.f;
+        height = 0.f;
+    }
+}
+
 Quad::Quad(glm::vec2 position, float scale, float rotation, float w, float h, Texture* tex, float tileX, float tileY) 
-            : pos(position), size(scale), rot(rotation), width(w), height(h), texture(tex)
+            : pos(position), size(scale), rot(rotation), width(w), height(h), texture(tex), solid(true), visible(true)
 {
     float uv[8];
 
@@ -11,8 +24,7 @@ Quad::Quad(glm::vec2 position, float scale, float rotation, float w, float h, Te
     }
     else 
     {
-        uv[0] = uv[2] = uv[4] = uv[6] = 0.0f;
-        uv[1] = uv[3] = uv[5] = uv[7] = 0.0f;
+        memset(uv, 0, sizeof(uv));
     }
 
     float vertices[] = 
@@ -28,24 +40,34 @@ Quad::Quad(glm::vec2 position, float scale, float rotation, float w, float h, Te
         width / 2.f ,  height / 2.f, 0.f,  uv[6], uv[7],
     };
 
-    glGenBuffers(1, &VBO);
-    glGenVertexArrays(1, &VAO);
+    if (texture != nullptr)
+    {
+        glGenBuffers(1, &VBO);
+        glGenVertexArrays(1, &VAO);
+        
+        glBindVertexArray(VAO);
+        glBindBuffer(GL_ARRAY_BUFFER, VBO);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
     
-    glBindVertexArray(VAO);
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-
-    // Base
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
-    glEnableVertexAttribArray(0); 
-    
-    // UV
-    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
-    glEnableVertexAttribArray(1);
+        // Base
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
+        glEnableVertexAttribArray(0); 
+        
+        // UV
+        glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
+        glEnableVertexAttribArray(1);
+    }
+    else 
+    {
+        VAO = 0;
+        VBO = 0;
+    }
 }
 
 void Quad::draw(Shader& shader)
 {
+    if (!visible) return;
+
     glm::mat4 model = glm::mat4(1.0f);
     model = glm::translate(model, glm::vec3(pos, 0.f));
     model = glm::rotate(model, rot, glm::vec3(0.0f, 0.0f, 1.0f));
@@ -72,6 +94,12 @@ void Quad::draw(Shader& shader)
     {
         texture->unbind(); 
     }
+
+    static int drawCalls = 0;
+    drawCalls++;
+    if (drawCalls % 1000 == 0)
+        std::cout << "Draw calls: " << drawCalls << std::endl;
+
 }
 
 bool Quad::checkCollision(const Quad& another)
