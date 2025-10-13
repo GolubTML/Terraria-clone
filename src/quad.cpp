@@ -94,12 +94,6 @@ void Quad::draw(Shader& shader)
     {
         texture->unbind(); 
     }
-
-    static int drawCalls = 0;
-    drawCalls++;
-    if (drawCalls % 1000 == 0)
-        std::cout << "Draw calls: " << drawCalls << std::endl;
-
 }
 
 bool Quad::checkCollision(const Quad& another)

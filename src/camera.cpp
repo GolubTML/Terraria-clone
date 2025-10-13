@@ -3,8 +3,6 @@
 #include <cmath>
 #include <iostream>
 
-#define DEBUG_VISIBLE_TILES
-
 Camera::Camera(float w, float h) : position(0.f), size(w, h) { }
 
 glm::mat4 Camera::getViewMatrix() const
