@@ -104,8 +104,8 @@ int main (int argv, char* args[])
     bool showDebugWindow = false;
 
     std::vector<std::vector<Quad>> world = quadLand(10);
-    World world1(2000, 50, getRandomSeed(), 0.1f);
-    world1.generate(dirt, grass);
+    World world1(1000, 200, getRandomSeed(), 0.1f);
+    world1.generate(stone, dirt, grass);
 
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();

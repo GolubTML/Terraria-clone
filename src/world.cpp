@@ -4,7 +4,7 @@ World::World(int w, int h, int s , float sc) : width(w), height(h), seed(s), sca
 {
 }
 
-void World::generate(Texture& stoneTex, Texture& grass)
+void World::generate(Texture& stoneTex, Texture& dirtTex, Texture& grass)
 {
     tiles.clear();
 
@@ -24,11 +24,31 @@ void World::generate(Texture& stoneTex, Texture& grass)
                 continue;
             }
 
-            if (y < groundHeight)
-                row.emplace_back(glm::vec2(x * 16.f, y * 16.f), 1.f, 0.f, 16.f, 16.f, &stoneTex, 3.4f, 1.1f);
-            else if (y == groundHeight)
+            if (y == groundHeight)
                 row.emplace_back(glm::vec2(x * 16.f, y * 16.f), 1.f, 0.f, 16.f, 16.f, &grass, 1.1f, 2.3f);
 
+            if (y < groundHeight)
+            {
+                if (y < groundHeight - 30.f)
+                {
+                    float caveNoise = stb_perlin_noise3(x * scale, y * scale, seed * 0.1f, 0.f, 0.f, 0.f);
+
+                    const float caveThreshold = -0.1f;
+                    
+                    if (caveNoise < caveThreshold)
+                    {
+                        row.emplace_back(true, true);
+                        continue;
+                    }
+                    else
+                    {
+                        row.emplace_back(glm::vec2(x * 16.f, y * 16.f), 1.f, 0.f, 16.f, 16.f, &stoneTex, 1.f, 1.f);
+                        continue;
+                    }
+                }
+
+                row.emplace_back(glm::vec2(x * 16.f, y * 16.f), 1.f, 0.f, 16.f, 16.f, &dirtTex, 3.4f, 1.1f);
+            }
         }
         tiles.push_back(row);
     }
