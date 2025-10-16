@@ -33,17 +33,13 @@ void Texture::unbind()
 
 void Texture::getUV(float tileX, float tileY, float uv[8])
 {
-    int stepX = tileWidth; 
-    int stepY = tileHeight; 
-    int realW = tileWidth - 1; 
-    int realH = tileHeight - 1; 
+    const float epsilon = 0.5f;
 
-    float u  = (tileX * stepX) / (float)width;
-    float v  = (tileY * stepY) / (float)height;
-    float u2 = (tileX * stepX + realW) / (float)width;
-    float v2 = (tileY * stepY + realH) / (float)height;
+    float u  = (tileX * tileWidth  + epsilon) / (float)width;
+    float v  = (tileY * tileHeight + epsilon) / (float)height;
+    float u2 = ((tileX + 1) * tileWidth  - epsilon) / (float)width;
+    float v2 = ((tileY + 1) * tileHeight - epsilon) / (float)height;
     
-
     uv[0] = u;  uv[1] = v;
     uv[2] = u2; uv[3] = v;
     uv[4] = u;  uv[5] = v2;

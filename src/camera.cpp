@@ -26,6 +26,11 @@ void Camera::setZoom(float& factor)
     zoom = factor;
 }
 
+void Camera::setSize(float w, float h)
+{
+    size = glm::vec2(w, h);
+}
+
 void Camera::move(glm::vec2 target)
 {
     position = target;

@@ -20,5 +20,6 @@ public:
 
     void move(glm::vec2 target);
     void setZoom(float& factor);
+    void setSize(float w, float h);
     void draw(std::vector<std::vector<Quad>>& world, Shader& shader);
 };

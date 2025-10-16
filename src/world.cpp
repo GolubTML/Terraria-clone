@@ -1,13 +1,18 @@
 #include "headers/world.h"
+#include "headers/assetmanager.h"
 
 World::World(int w, int h, int s , float sc) : width(w), height(h), seed(s), scale(sc) 
 {
 }
 
-void World::generate(Texture& stoneTex, Texture& dirtTex, Texture& grass)
+void World::generate()
 {
     const float GROUND_LAYER_HEIGHT = 50.f; 
     tiles.clear();
+
+    Texture& stone = AssetManager::getTexture("tiles/Tiles_1.png");
+    Texture& dirt  = AssetManager::getTexture("tiles/Tiles_0.png");
+    Texture& grass = AssetManager::getTexture("tiles/Tiles_2.png");
 
     for (int y = 0; y < height; ++y)
     {
@@ -43,12 +48,12 @@ void World::generate(Texture& stoneTex, Texture& dirtTex, Texture& grass)
                     }
                     else
                     {
-                        row.emplace_back(glm::vec2(x * 16.f, y * 16.f), 1.f, 0.f, 16.f, 16.f, &stoneTex, 1.f, 1.f);
+                        row.emplace_back(glm::vec2(x * 16.f, y * 16.f), 1.f, 0.f, 16.f, 16.f, &stone, 1.f, 1.f);
                         continue;
                     }
                 }
 
-                row.emplace_back(glm::vec2(x * 16.f, y * 16.f), 1.f, 0.f, 16.f, 16.f, &dirtTex, 3.4f, 1.1f);
+                row.emplace_back(glm::vec2(x * 16.f, y * 16.f), 1.f, 0.f, 16.f, 16.f, &dirt, 3.4f, 1.1f);
             }
         }
         tiles.push_back(row);

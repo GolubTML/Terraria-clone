@@ -21,6 +21,7 @@
 #include "headers/world.h"
 #include "headers/camera.h"
 #include "headers/debug.h"
+#include "headers/assetmanager.h"
 
 unsigned int getRandomSeed() 
 {
@@ -59,6 +60,7 @@ std::vector<std::vector<Quad>> quadLand(int size)
 
 int main (int argv, char* args[])
 {
+    int display_w = 800, display_h = 600;
     // -- INIT OF GLFW
     if (!glfwInit()) std::cout << "Failed to init GLFW context!" << std::endl;
 
@@ -67,7 +69,7 @@ int main (int argv, char* args[])
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-    GLFWwindow* window = glfwCreateWindow(800, 600, "Terraria", NULL, NULL);
+    GLFWwindow* window = glfwCreateWindow(display_w, display_h, "Terraria", NULL, NULL);
     if (window == NULL)
     {
         throw std::runtime_error("Cannot open GLFW window!");
@@ -88,13 +90,16 @@ int main (int argv, char* args[])
     int tileX = 0;
     int tileY = 0;
 
-    Camera camera(800, 600);
+    Camera camera(display_w, display_h);
 
     Shader shader("src/shaders/vertex.glsl", "src/shaders/fragment.glsl");
     shader.use();
-    Texture stone("textures/tiles/Tiles_1.png", 16, 16);
-    Texture dirt("textures/tiles/Tiles_0.png", 16, 16);
-    Texture grass("textures/tiles/Tiles_2.png", 16, 16);
+
+    AssetManager::loadAll("textures/");
+
+    Texture& stone = AssetManager::getTexture("tiles/Tiles_1.png");
+    Texture& dirt  = AssetManager::getTexture("tiles/Tiles_0.png");
+    Texture& grass = AssetManager::getTexture("tiles/Tiles_2.png");
 
     Quad playerSkin(glm::vec2(1000.f, 1400.f), 1.f, 0.f, 20.f, 32.f, &stone, 1.f, 1.f);
     Player player(playerSkin);
@@ -106,7 +111,7 @@ int main (int argv, char* args[])
 
     std::vector<std::vector<Quad>> world = quadLand(10);
     World world1(1000, 300, getRandomSeed(), 0.1f);
-    world1.generate(stone, dirt, grass);
+    world1.generate();
 
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
@@ -141,9 +146,9 @@ int main (int argv, char* args[])
             debug.draw(player, camera, deltaTime);
 
         ImGui::Render();
-        int display_w, display_h;
         glfwGetFramebufferSize(window, &display_w, &display_h);
         glViewport(0, 0, display_w, display_h);
+        camera.setSize(display_w, display_h);
         glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
