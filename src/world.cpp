@@ -6,6 +6,7 @@ World::World(int w, int h, int s , float sc) : width(w), height(h), seed(s), sca
 
 void World::generate(Texture& stoneTex, Texture& dirtTex, Texture& grass)
 {
+    const float GROUND_LAYER_HEIGHT = 50.f; 
     tiles.clear();
 
     for (int y = 0; y < height; ++y)
@@ -29,7 +30,7 @@ void World::generate(Texture& stoneTex, Texture& dirtTex, Texture& grass)
 
             if (y < groundHeight)
             {
-                if (y < groundHeight - 30.f)
+                if (y < groundHeight - GROUND_LAYER_HEIGHT)
                 {
                     float caveNoise = stb_perlin_noise3(x * scale, y * scale, seed * 0.1f, 0.f, 0.f, 0.f);
 
@@ -63,7 +64,7 @@ float World::getNoise(float x, float seed, float scale)
     // freq - множитель частоты.
     // maxValue - максимальное значение, для того чтобы сделать нормализацию до -1, 1.
     float total = 0; 
-    float amp = 1.f;
+    float amp = 1.0f;
     float freq = 1.f;
     float maxValue = 0;
 
@@ -72,8 +73,8 @@ float World::getNoise(float x, float seed, float scale)
         // По факту, чем меньше freq, тем менее четче будет шум.
         total += stb_perlin_noise3(x * scale * freq, seed * 0.1f, 0.f, 0, 0, 0) * amp; 
         maxValue += amp; // - Нужно для нормализовки в будущем.
-        amp *= 0.5f; // - Для того, чтобы следующие октавы были меньше. Эффект холмов.
-        freq *= 2.f; // - Для того, чтобы следующие октавы былы менее детолезированы.
+        amp *= 2.f; // - Для того, чтобы следующие октавы были меньше. Эффект холмов.
+        freq *= 0.5f; // - Для того, чтобы следующие октавы былы менее детолезированы.
     }
     
     // Нормализуем и возращаем наш шум.

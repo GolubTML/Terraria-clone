@@ -1,4 +1,5 @@
 #include "headers/player.h"
+#include <cmath>
 
 Player::Player(Quad s) : skin(s) { }
 
@@ -6,13 +7,10 @@ void Player::update(GLFWwindow* window, float speed, std::vector<std::vector<Qua
 {
     if (!ghostMode)
     {
-        int rX = 10;
-        int rY = 5;
+        int radius = 5;
+        
+        vel.x = 0.f;
 
-        int playerTileX = (int)(skin.pos.x / 16.f);
-        int playerTileY = (int)(skin.pos.y / 16.f);
-
-        vel.x = 0;
         if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) vel.x -= speed * dT;
         if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) vel.x += speed * dT;
 
@@ -32,83 +30,92 @@ void Player::update(GLFWwindow* window, float speed, std::vector<std::vector<Qua
         }
 
         skin.pos.x += vel.x;
-        collideX(world);
+        
+        int playerTileY = static_cast<int>(skin.pos.y / 16.f);
+        int playerTileX = static_cast<int>(skin.pos.x / 16.f);
+        
+        int worldH = static_cast<int>(world.size());     
+        int worldW = static_cast<int>(world[0].size());  
+        
+        int startX = std::max(playerTileX - radius, 0);
+        int endX   = std::min(playerTileX + radius, worldW - 1);
+        
+        int startY = std::max(playerTileY - radius, 0);
+        int endY   = std::min(playerTileY + radius, worldH - 1);
+        
+        for (int y = startY; y <= endY; ++y)
+        {
+            for (int x = startX; x <= endX; ++x)
+            {
+                collide(world[y][x], Axis::X);
+            }
+        }
+        
+        onGround = false;
         skin.pos.y += vel.y;
-        collideY(world);
+
+        for (int y = startY; y <= endY; ++y)
+        {
+            for (int x = startX; x <= endX; ++x)
+            {
+                collide(world[y][x], Axis::Y);
+            }
+        }
     }
     else
     {
-        if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) vel.x -= speed / 10.f;
-        if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) vel.x += speed / 10.f;
-        if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) vel.y += speed / 10.f;
-        if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) vel.y -= speed / 10.f;
-
-        skin.pos.x = vel.x;
-        skin.pos.y = vel.y;
+        if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) skin.pos.x -= speed / 10.f;
+        if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) skin.pos.x += speed / 10.f;
+        if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) skin.pos.y += speed / 10.f;
+        if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) skin.pos.y -= speed / 10.f;
     }
 }
 
-void Player::collideX(std::vector<std::vector<Quad>>& world)
+void Player::collide(Quad& tile, Axis axis)
 {
-    for (auto& row : world)
+    if (skin.checkCollision(tile)) 
     {
-        for (auto& tile : row)
+        if (axis == Axis::X)
         {
-            if (skin.checkCollision(tile)) 
+            float leftA   = skin.pos.x - skin.width  / 2.0f;
+            float rightA  = skin.pos.x + skin.width  / 2.0f;
+            float leftB   = tile.pos.x - tile.width  / 2.0f;
+            float rightB  = tile.pos.x + tile.width  / 2.0f;
+
+            float overlapLeft  = rightB - leftA;
+            float overlapRight = rightA - leftB;
+
+            if (overlapLeft < overlapRight)
+                skin.pos.x = rightB + skin.width / 2.0f;
+            else
+                skin.pos.x = leftB - skin.width / 2.0f;
+
+            vel.x = 0.0f;
+        }
+        else
+        {
+            float bottomA = skin.pos.y - skin.height / 2.0f;
+            float topA    = skin.pos.y + skin.height / 2.0f;
+            float bottomB = tile.pos.y - tile.height / 2.0f;
+            float topB    = tile.pos.y + tile.height / 2.0f;
+
+            float overlapBottom = topB - bottomA;
+            float overlapTop    = topA - bottomB;
+
+            if (overlapBottom < overlapTop) 
             {
-                float leftA   = skin.pos.x - skin.width  / 2.0f;
-                float rightA  = skin.pos.x + skin.width  / 2.0f;
-                float leftB   = tile.pos.x - tile.width  / 2.0f;
-                float rightB  = tile.pos.x + tile.width  / 2.0f;
-
-                float overlapLeft  = rightB - leftA;
-                float overlapRight = rightA - leftB;
-
-                if (overlapLeft < overlapRight)
-                    skin.pos.x = rightB + skin.width / 2.0f;
-                else
-                    skin.pos.x = leftB - skin.width / 2.0f;
-
-                vel.x = 0.0f;
+                skin.pos.y = topB + skin.height / 2.0f;
+                onGround = true;
             }
+            else
+            {
+                skin.pos.y = bottomB - skin.height / 2.0f;
+            }
+
+            vel.y = 0.0f;
         }
     }
 }
-
-void Player::collideY(std::vector<std::vector<Quad>>& world)
-{
-    onGround = false;
-
-    for (auto& row : world)
-    {
-        for (auto& tile : row)
-        {
-            if (skin.checkCollision(tile))
-            {
-                float bottomA = skin.pos.y - skin.height / 2.0f;
-                float topA    = skin.pos.y + skin.height / 2.0f;
-                float bottomB = tile.pos.y - tile.height / 2.0f;
-                float topB    = tile.pos.y + tile.height / 2.0f;
-
-                float overlapBottom = topB - bottomA;
-                float overlapTop    = topA - bottomB;
-
-                if (overlapBottom < overlapTop) 
-                {
-                    skin.pos.y = topB + skin.height / 2.0f;
-                    onGround = true;
-                }
-                else
-                {
-                    skin.pos.y = bottomB - skin.height / 2.0f;
-                }
-
-                vel.y = 0.0f;
-            }
-        }
-    }
-}
-
 
 void Player::draw(Shader shader)
 {

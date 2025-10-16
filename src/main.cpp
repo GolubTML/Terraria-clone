@@ -22,7 +22,8 @@
 #include "headers/camera.h"
 #include "headers/debug.h"
 
-unsigned int getRandomSeed() {
+unsigned int getRandomSeed() 
+{
     using namespace std::chrono;
     return static_cast<unsigned int>(
         duration_cast<milliseconds>(steady_clock::now().time_since_epoch()).count()
@@ -95,7 +96,7 @@ int main (int argv, char* args[])
     Texture dirt("textures/tiles/Tiles_0.png", 16, 16);
     Texture grass("textures/tiles/Tiles_2.png", 16, 16);
 
-    Quad playerSkin(glm::vec2(1000.f, 800.f), 1.f, 0.f, 20.f, 48.f, &stone, 1.f, 1.f);
+    Quad playerSkin(glm::vec2(1000.f, 1400.f), 1.f, 0.f, 20.f, 32.f, &stone, 1.f, 1.f);
     Player player(playerSkin);
 
     float lastFrame = 0.0f;
@@ -104,7 +105,7 @@ int main (int argv, char* args[])
     bool showDebugWindow = false;
 
     std::vector<std::vector<Quad>> world = quadLand(10);
-    World world1(1000, 200, getRandomSeed(), 0.1f);
+    World world1(1000, 300, getRandomSeed(), 0.1f);
     world1.generate(stone, dirt, grass);
 
     IMGUI_CHECKVERSION();
@@ -131,7 +132,7 @@ int main (int argv, char* args[])
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
         
-        bool now = glfwGetKey(window, GLFW_KEY_F4) == GLFW_PRESS;
+        bool now = (glfwGetKey(window, GLFW_KEY_F4) || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT)) == GLFW_PRESS;
         if (now && !last) debugVisible = !debugVisible;
         last = now;
 
@@ -173,7 +174,6 @@ int main (int argv, char* args[])
     ImGui_ImplOpenGL3_Shutdown();
     ImGui_ImplGlfw_Shutdown();
     ImGui::DestroyContext();
-
 
     glfwDestroyWindow(window);
     glfwTerminate();

@@ -9,6 +9,7 @@ void DebugWindow::draw(Player& player, Camera& camera, float dT)
     ImGui::Text("--Player--");
     ImGui::Text("Position: (%.2f, %.2f)", player.skin.pos.x, player.skin.pos.y);
     ImGui::Text("Velocity: (%.2f, %.2f)", player.vel.x, player.vel.y);
+    ImGui::Text("On ground: (%s)", player.onGround ? "true" : "false");
     ImGui::Separator();
 
     ImGui::DragFloat2("Player position edit.", (float*)&player.skin.pos, 1.f);

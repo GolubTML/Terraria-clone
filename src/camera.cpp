@@ -37,18 +37,18 @@ void Camera::draw(std::vector<std::vector<Quad>>& world, Shader& shader)
 
     if (world.empty()) return;
 
-    int height = (int)world.size();
-    int width = (int)world[0].size();
+    int height = static_cast<int>(world.size());
+    int width = static_cast<int>(world[0].size());
 
     float left   = position.x - size.x / 2.f;
     float right  = position.x + size.x / 2.f;
     float bottom = position.y - size.y / 2.f;
     float top    = position.y + size.y / 2.f;
 
-    int x0 = std::max(0, (int)std::floor(left / TILE_SIZE) - 1);
-    int x1 = std::min(width - 1, (int)std::ceil((right) / TILE_SIZE) + 1);
-    int y0 = std::max(0, (int)std::floor(bottom / TILE_SIZE) - 1);
-    int y1 = std::min(height - 1, (int)std::ceil((top) / TILE_SIZE) + 1);
+    int x0 = std::max(0, static_cast<int>(std::floor(left / TILE_SIZE)) - 1);
+    int x1 = std::min(width - 1, static_cast<int>(std::ceil((right) / TILE_SIZE)) + 1);
+    int y0 = std::max(0, static_cast<int>(std::floor(bottom / TILE_SIZE)) - 1);
+    int y1 = std::min(height - 1, static_cast<int>(std::ceil((top) / TILE_SIZE)) + 1);
 
 #ifdef DEBUG_VISIBLE_TILES
     std::cout << "tiles: X(" << x0 << "-" << x1 << ") Y(" << y0 << "-" << y1 << ")\n";
