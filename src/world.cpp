@@ -48,7 +48,7 @@ void World::generate()
                     }
                     else
                     {
-                        row.emplace_back(glm::vec2(x * 16.f, y * 16.f), 1.f, 0.f, 16.f, 16.f, &stone, 1.f, 1.f);
+                        row.emplace_back(glm::vec2(x * 16.f, y * 16.f), 1.f, 0.f, 16.f, 16.f, &stone, 3.4f, 1.1f);
                         continue;
                     }
                 }
