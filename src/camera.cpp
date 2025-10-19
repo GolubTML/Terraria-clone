@@ -21,11 +21,6 @@ glm::mat4 Camera::getProjectionMatrix() const
     return glm::ortho(-halfW, halfW, -halfH, halfH, -1.f, 1.f);
 }
 
-void Camera::setZoom(float& factor)
-{
-    zoom = factor;
-}
-
 void Camera::setSize(float w, float h)
 {
     size = glm::vec2(w, h);

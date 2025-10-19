@@ -1,7 +1,10 @@
 #include "headers/player.h"
 #include <cmath>
 
-Player::Player(Quad s) : skin(s) { }
+Player::Player(Quad s) : skin(s) 
+{ 
+    pos = skin.pos;
+}
 
 void Player::update(GLFWwindow* window, float speed, std::vector<std::vector<Quad>>& world, float& dT)
 {
@@ -29,10 +32,10 @@ void Player::update(GLFWwindow* window, float speed, std::vector<std::vector<Qua
             vel.y = vel.y;
         }
 
-        skin.pos.x += vel.x;
-        
-        int playerTileY = static_cast<int>(skin.pos.y / 16.f);
-        int playerTileX = static_cast<int>(skin.pos.x / 16.f);
+        pos.x += vel.x;
+
+        int playerTileY = static_cast<int>(pos.y / 16.f);
+        int playerTileX = static_cast<int>(pos.x / 16.f);
         
         int worldH = static_cast<int>(world.size());     
         int worldW = static_cast<int>(world[0].size());  
@@ -52,7 +55,7 @@ void Player::update(GLFWwindow* window, float speed, std::vector<std::vector<Qua
         }
         
         onGround = false;
-        skin.pos.y += vel.y;
+        pos.y += vel.y;
 
         for (int y = startY; y <= endY; ++y)
         {
@@ -64,21 +67,58 @@ void Player::update(GLFWwindow* window, float speed, std::vector<std::vector<Qua
     }
     else
     {
-        if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) skin.pos.x -= speed / 10.f;
-        if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) skin.pos.x += speed / 10.f;
-        if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) skin.pos.y += speed / 10.f;
-        if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) skin.pos.y -= speed / 10.f;
+        if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) pos.x -= speed / 10.f;
+        if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) pos.x += speed / 10.f;
+        if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) pos.y += speed / 10.f;
+        if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) pos.y -= speed / 10.f;
     }
+
+    double mouseX, mouseY;
+    glfwGetCursorPos(window, &mouseX, &mouseY);
+
+    int tileX = static_cast<int>(mouseX) / 16;
+    int tileY = static_cast<int>(mouseY) / 16;
+
+    if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_1) == GLFW_PRESS)
+    {
+        if (tileY >= 0 && tileY < world.size() && tileX >= 0 && tileX < world[0].size())
+        {
+            Quad& quad = world[tileY][tileX];
+            if (quad.solid && quad.visible)
+            {
+                quad.solid   = false;
+                quad.visible = false;
+            }
+        }
+    }
+
+    skin.pos = pos;
+}
+
+bool Player::isColliding(const Quad& another)
+{
+    float leftA   = pos.x - skin.width  / 2.0f;
+    float rightA  = pos.x + skin.width  / 2.0f;
+    float bottomA = pos.y - skin.height / 2.0f;
+    float topA    = pos.y + skin.height / 2.0f;
+
+    float leftB   = another.pos.x - another.width  / 2.0f;
+    float rightB  = another.pos.x + another.width  / 2.0f;
+    float bottomB = another.pos.y - another.height / 2.0f;
+    float topB    = another.pos.y + another.height / 2.0f;
+
+    return leftA < rightB && rightA > leftB &&
+           bottomA < topB && topA > bottomB;
 }
 
 void Player::collide(Quad& tile, Axis axis)
 {
-    if (skin.checkCollision(tile)) 
+    if (isColliding(tile)) 
     {
         if (axis == Axis::X)
         {
-            float leftA   = skin.pos.x - skin.width  / 2.0f;
-            float rightA  = skin.pos.x + skin.width  / 2.0f;
+            float leftA   = pos.x - skin.width  / 2.0f;
+            float rightA  = pos.x + skin.width  / 2.0f;
             float leftB   = tile.pos.x - tile.width  / 2.0f;
             float rightB  = tile.pos.x + tile.width  / 2.0f;
 
@@ -86,16 +126,16 @@ void Player::collide(Quad& tile, Axis axis)
             float overlapRight = rightA - leftB;
 
             if (overlapLeft < overlapRight)
-                skin.pos.x = rightB + skin.width / 2.0f;
+                pos.x = rightB + skin.width / 2.0f;
             else
-                skin.pos.x = leftB - skin.width / 2.0f;
+                pos.x = leftB - skin.width / 2.0f;
 
             vel.x = 0.0f;
         }
         else
         {
-            float bottomA = skin.pos.y - skin.height / 2.0f;
-            float topA    = skin.pos.y + skin.height / 2.0f;
+            float bottomA = pos.y - skin.height / 2.0f;
+            float topA    = pos.y + skin.height / 2.0f;
             float bottomB = tile.pos.y - tile.height / 2.0f;
             float topB    = tile.pos.y + tile.height / 2.0f;
 
@@ -104,12 +144,12 @@ void Player::collide(Quad& tile, Axis axis)
 
             if (overlapBottom < overlapTop) 
             {
-                skin.pos.y = topB + skin.height / 2.0f;
+                pos.y = topB + skin.height / 2.0f;
                 onGround = true;
             }
             else
             {
-                skin.pos.y = bottomB - skin.height / 2.0f;
+                pos.y = bottomB - skin.height / 2.0f;
             }
 
             vel.y = 0.0f;

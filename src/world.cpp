@@ -31,7 +31,7 @@ void World::generate()
             }
 
             if (y == groundHeight)
-                row.emplace_back(glm::vec2(x * 16.f, y * 16.f), 1.f, 0.f, 16.f, 16.f, &grass, 1.1f, 2.3f);
+                row.emplace_back(glm::vec2(x * 16.f, y * 16.f), 1.f, 0.f, 16.f, 16.f, &grass, 3.4f, 0.f);
 
             if (y < groundHeight)
             {

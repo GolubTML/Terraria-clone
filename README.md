@@ -7,10 +7,12 @@ For this, type `sudo pacman -S glfw glew glm`
 
 ## Some in game screenshoots
 
-![alt text](image.png)
+![alt text](previews(alpha)/image.png)
+
 Here, window in 1920x1080 resolution, and we have 60~70 fps.
 
-![alt text](image-1.png)
+![alt text](previews(alpha)/image-1.png)
+
 And here, window in 800x600 resolution, we have 200~250 fps.
 
 This all fow now :D

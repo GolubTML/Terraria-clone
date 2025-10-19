@@ -31,33 +31,6 @@ unsigned int getRandomSeed()
     );
 }
 
-
-void input(GLFWwindow* window, glm::vec2& pos, float velocity)
-{
-    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) pos.y += velocity;
-    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) pos.y -= velocity;
-    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) pos.x -= velocity;
-    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) pos.x += velocity;
-}
-
-std::vector<std::vector<Quad>> quadLand(int size)
-{
-    std::vector<std::vector<Quad>> col;
-    for (int i = 0; i < size; ++i)
-    {
-        std::vector<Quad> row;
-        for (int j = 0; j < size; ++j)
-        {
-            Quad quad(glm::vec2(i * 16.f, j * 16.f), 1.f, 0.f, 16.f, 16.f, nullptr, 0, 0);
-            row.push_back(quad);
-        }
-
-        col.push_back(row);
-    }
-
-    return col;
-}
-
 int main (int argv, char* args[])
 {
     int display_w = 800, display_h = 600;
@@ -109,7 +82,6 @@ int main (int argv, char* args[])
 
     bool showDebugWindow = false;
 
-    std::vector<std::vector<Quad>> world = quadLand(10);
     World world1(1000, 300, getRandomSeed(), 0.1f);
     world1.generate();
 
@@ -143,15 +115,13 @@ int main (int argv, char* args[])
 
 
         if (debugVisible)
-            debug.draw(player, camera, deltaTime);
+            debug.draw(window, player, camera, deltaTime);
 
-        ImGui::Render();
         glfwGetFramebufferSize(window, &display_w, &display_h);
         glViewport(0, 0, display_w, display_h);
         camera.setSize(display_w, display_h);
         glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
-        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
         camera.move(player.skin.pos);
         
@@ -171,6 +141,9 @@ int main (int argv, char* args[])
         player.draw(shader);
 
         camera.draw(world1.tiles, shader);
+
+        ImGui::Render();
+        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
         glfwSwapBuffers(window);
         glfwPollEvents();
