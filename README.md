@@ -21,4 +21,6 @@ Here, window in 1920x1080 resolution, and we have 60~70 fps.
 
 And here, window in 800x600 resolution, we have 200~250 fps.
 
+You can toggle the debug window by pressin F5 or R. Shift.
+
 This all fow now :D
